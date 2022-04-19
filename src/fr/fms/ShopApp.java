@@ -1,5 +1,6 @@
 package fr.fms;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -24,7 +25,8 @@ public class ShopApp {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) {
-
+		
+		try {
 		shopInit();
 		welcome();
 
@@ -49,6 +51,12 @@ public class ShopApp {
 
 
 		scan.close();
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+	
 
 		// insertion d'un article
 		//Article art=new Article("Tapis de souris","Asus",45.99 );
@@ -98,7 +106,7 @@ public class ShopApp {
 
 	}
 	// lecture de la table articles
-	private static void listArticles() {
+	private static void listArticles() throws SQLException {
 
 		System.out.println("Liste des articles : ");
 		for(Article a : shop.readAll())
@@ -127,8 +135,9 @@ public class ShopApp {
 	}
 	/**
 	 * initialisation de la boutique
+	 * @throws SQLException 
 	 */
-	private static void shopInit() {
+	private static void shopInit() throws SQLException {
 		// TODO Auto-generated method stub
 		shop = new ArticleDao();
 		user=new UserDao();

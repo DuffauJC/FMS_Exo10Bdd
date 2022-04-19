@@ -17,7 +17,7 @@ public class UserDao implements Dao<User> {
 	}
 	
 	@Override
-	public void create(User obj) {
+	public void create(User obj) throws SQLException {
 		String strSql="INSERT INTO T_Users(Login, Password) VALUES(?, ?);";	// une fois connecté, réalisation d'un requête
 		try(PreparedStatement ps =connection.prepareStatement(strSql)){ // de java.sql
 			ps.setString(1, obj.getLogin());
@@ -29,12 +29,13 @@ public class UserDao implements Dao<User> {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new SQLException("Erreur de création");
 		}
 		
 	}
 
 	@Override
-	public User read(int id) {
+	public User read(int id) throws SQLException {
 		User user = null;
 		String strSql="SELECT * FROM t_users WHERE IdUser = ?;";		// une fois connecté, réalisation d'un requête
 		try(PreparedStatement ps =connection.prepareStatement(strSql)){ // de java.sql
@@ -51,13 +52,14 @@ public class UserDao implements Dao<User> {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new SQLException("Erreur de lecture.");
 		}
 
 		return user;
 	}
 
 	@Override
-	public boolean update(User obj) {
+	public boolean update(User obj) throws SQLException {
 		String strSql="UPDATE t_users SET login = ?, password = ? WHERE IdUser = ? ;";						// une fois connecté, réalisation d'un requête
 		try(PreparedStatement ps =connection.prepareStatement(strSql)){ // de java.sql
 			ps.setString(1, obj.getLogin());
@@ -68,19 +70,17 @@ public class UserDao implements Dao<User> {
 			if (ps.executeUpdate()==1) {
 				System.out.println("mise à jour ok");
 				return true;
-			}else {
-				System.out.println("mise à jour erreur");
-				return false;
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new SQLException("Erreur de mise à jour.");
 		}
 		return false;
 	}
 
 	@Override
-	public boolean delete(int id) {
+	public boolean delete(int id) throws SQLException {
 		String strSql="DELETE FROM t_users WHERE IdUser = ?;";	// une fois connecté, réalisation d'un requête
 		try(PreparedStatement ps =connection.prepareStatement(strSql)){ // de java.sql
 			ps.setInt(1, id);
@@ -88,13 +88,11 @@ public class UserDao implements Dao<User> {
 			if (ps.executeUpdate()==1) {
 				System.out.println("suppression ok");
 				return true;
-			}else {
-				System.out.println("echec de suppression");
-				return false;
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new SQLException("Erreur de suppréssion.");
 		}
 
 
@@ -102,7 +100,7 @@ public class UserDao implements Dao<User> {
 	}
 
 	@Override
-	public ArrayList<User> readAll() {
+	public ArrayList<User> readAll() throws SQLException {
 		String strSql="SELECT * FROM T_users";						// une fois connecté, réalisation d'un requête
 		try(Statement statement =connection.createStatement()){
 			try(ResultSet resultSet=statement.executeQuery(strSql)){   // ResultSet de java.sql
@@ -117,6 +115,7 @@ public class UserDao implements Dao<User> {
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
+			throw new SQLException("Erreur de lecture de la table.");
 		}
 
 		return users;
