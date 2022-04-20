@@ -6,6 +6,7 @@ public class Article {
 	private String description;
 	private String brand;
 	private double unitaryPrice;
+	private int qty=1;
 
 	public Article(int idArticle, String description, String brand, double unitaryPrice) {
 		
@@ -13,6 +14,7 @@ public class Article {
 		setDescription(description);
 		setBrand(brand);
 		setUnitaryPrice(unitaryPrice);
+		setQty(qty);
 
 	}
 
@@ -64,10 +66,18 @@ public class Article {
 	}
 
 
+	public int getQty() {
+		return qty;
+	}
+
+	public void setQty(int qty) {
+		this.qty = qty;
+	}
+
 	@Override
 	public String toString() {
-		return "Article [ idArticle = " + idArticle + ", description = " + description + ", brand = " + brand
-				+ ", unitaryPrice = " + unitaryPrice + " ]";
+		return "Article [idArticle=" + idArticle + ", description=" + description + ", brand=" + brand
+				+ ", unitaryPrice=" + unitaryPrice + ", qty=" + qty + "]";
 	}
 
 

@@ -1,9 +1,11 @@
 package fr.fms;
 
 import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import fr.fms.business.IShopBusinessImpl;
 import fr.fms.dao.ArticleDao;
 
 import fr.fms.dao.UserDao;
@@ -13,11 +15,10 @@ import fr.fms.entities.User;
 
 public class ShopApp {
 
-
-	private static ArticleDao shop;	
+	private static ArticleDao article;	
 	private static UserDao user;
-	private static ArrayList<Article> articles;
 	private static ArrayList<User> users;
+	private static IShopBusinessImpl shopJob;	
 
 	/**
 	 * 
@@ -25,103 +26,46 @@ public class ShopApp {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) {
-		
+
 		try {
-		shopInit();
-		welcome();
+			shopInit();
+			welcome();
 
-		Scanner scan = new Scanner(System.in); 
+			Scanner scan = new Scanner(System.in); 
 
-		String login = "";
-		String password = "";
-		User userOk=null;
+			String login = "";
+			String password = "";
+			User userOk=null;
 
-		System.out.println("Tapez votre login et mot de passe pour accéder au menu.");
+			while (true) {
+				System.out.println("Tapez votre login et mot de passe pour accéder au menu.");
+				// Verfie si le compte existe.
+				userOk=	scanLogin(scan,login,password);
 
-		// Verfie si le compte existe.
-		userOk=	scanLogin(scan,login,password);
+				if (userOk!=null) {
+					mainFunction(userOk,scan);
+				} else {
+					System.out.println("Client inexistant.");
+				}
 
-		if (userOk!=null) {
-			System.out.println("Salut "+userOk.getLogin());	
-			listArticles();
-		} else {
-			System.out.println("Client inexistant.");
-		}
-		
+			}
 
 
-		scan.close();
-			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 
-	
-
-		// insertion d'un article
-		//Article art=new Article("Tapis de souris","Asus",45.99 );
-		//shop.create(art);
-
-		// mise à jour d'un article que je récupère
-		//Article modifArticle=shop.read(4);
-		//modif.setDescription("Tapis de douche");
-		//modif.setBrand("Baleine bleue");
-		//modif.setUnitaryPrice(499.99);
-		//shop.update(modif);
-
-		// suppression d'un article
-		//shop.delete(4);
-
-		// lecture d'un article en fonction de son identifiant
-		/*
-		 * Article readArticle=shop.read(16); if (readArticle!=null) {
-		 * System.out.println("Affichage de l' "+readArticle.toString()); } else {
-		 * System.out.println("Article inexistant"); }
-		 */
-
-		///////////////////////////////////////////// User
-
-		// insertion d'un utilisateur
-		//User util=new User("JCD","zozo31" );
-		//user.create(util);
-
-		//Liste users
-		//listUsers();
-
-		// mise à jour d'un utilisateur que je récupère
-		//User modifUser=user.read(3);
-		//modifUser.setPassword("Chewby82");
-		//user.update(modifUser);
-
-		// suppression d'un utilisateur
-		//user.delete(5);
-
-		// lecture d'un utilisateur en fonction de son identifiant
-
-		//User readUser=user.read(4); if (readUser!=null) {
-		//System.out.println("Affichage de l' "+readUser.toString()); } else {
-		//System.out.println("Article inexistant"); }
-
-		
-
+		////////////// Methodes ////////////
 	}
 	// lecture de la table articles
 	private static void listArticles() throws SQLException {
 
 		System.out.println("Liste des articles : ");
-		for(Article a : shop.readAll())
+		for(Article a : article.readAll())
 			System.out.println(a);
 
 	}
 
-	// lecture de la table users
-	private static void listUsers() {
-
-		System.out.println("Liste des utilisateurs : ");
-		for(User u : users)
-			System.out.println(u);
-
-	}
 	private static User scanLogin(Scanner scan, String login, String password) {
 		User user = null;
 		login=scan.next(); 
@@ -139,10 +83,10 @@ public class ShopApp {
 	 */
 	private static void shopInit() throws SQLException {
 		// TODO Auto-generated method stub
-		shop = new ArticleDao();
+		article = new ArticleDao();
 		user=new UserDao();
+		shopJob = new IShopBusinessImpl();
 		users=user.readAll();
-
 
 	}
 
@@ -155,6 +99,178 @@ public class ShopApp {
 		System.out.println("   BIENVENU CHEZ SHOPPING-SHOPPANG");
 		System.out.println("************************************");		
 		System.out.println();
+	}
+	/**
+	 * affichage du menu
+	 */
+	public static  void showMenu() {
+
+		System.out.print("1.Ajouter au panier - ");
+		System.out.print("2.Voir le panier - ");
+		System.out.print("3.Modifier panier - ");
+		System.out.print("4.Valider commande - ");
+		System.out.print("5.Sortir \n");
+	}
+
+	public static void mainFunction(User user, Scanner scan) {
+
+		int action=0;
+		int index;
+
+		System.out.println("Bienvenue "+user.getLogin()+" que souhaitez-vous faire ?");
+
+		while(action != 5) {
+			try {
+
+				// Affichage du menu
+				showMenu();
+
+				action = scan.nextInt();
+
+				switch(action) {
+				case 1 : // ajouter au panier
+					listArticles();
+					System.out.println("Tapez la référence à ajouter.");
+
+					while(!scan.hasNextInt()) {
+						System.out.println("La valeur rentrée est incorrecte, saisir une nouvelle entrée.");
+						scan.next();
+					}
+
+					index =scan.nextInt();
+
+					// lecture d'un article en fonction de son identifiant
+					Article readArticle=article.read(index); 
+					if (readArticle!=null) {
+						shopJob.addCaddy(readArticle);
+					} 
+					else {
+						System.out.println("Article inexistant"); 
+					}
+
+					break;
+
+				case 2 : // voir panier
+					caddy();
+
+					break;
+
+				case 3 : // modifier panier
+					displayCaddy(scan);
+
+					break;
+
+				case 4 : // valider panier
+					displayCommand(scan);
+
+					break;
+
+				case 5 : // Exit account
+					System.out.println("Exit shop.");
+					break;
+
+				default : System.out.println("Mauvaise saisie, votre choix : "+action+" est inexistant dans le menu");
+				}	
+
+
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+
+
+		}
+
+	}
+	private static void caddy() {
+		if (shopJob.readAll().isEmpty()) {
+			System.out.println("Panier inexistant.");
+		} else {
+			System.out.println("Articles du panier : ");
+			shopJob.readAll().forEach((key,value)->{	
+				System.out.println("Ref : "+key+" "+value.getDescription()+" "+value.getBrand()+" "+value.getUnitaryPrice()+" $ "+" qty : "+value.getQty());
+			});
+		}
+
+	}
+	/** M�thode qui affiche le panier  */
+	public static void displayCaddy(Scanner scan) {
+
+		caddy();
+		// caddy not empty, show menu
+		if (!shopJob.readAll().isEmpty()) {
+
+			int rep=1;
+
+
+			while(rep != 3) {
+
+				System.out.println("1 : Pour modifier une quantité.");
+				System.out.println("2 : Supprimer un article.");
+				System.out.println("3 : Quitter le panier.");
+
+				while(!scan.hasNextInt()) {
+					System.out.println("La valeur rentrée n'était pas du type voulu");
+					scan.next();
+				}
+				rep = scan.nextInt();
+
+				switch(rep) {
+				case 1 : // Modification d'une quantité
+					System.out.println("Pour modifier une quantité sasir ref.");
+					int	index=scan.nextInt();
+
+					// mise à jour d'un article que je récupère
+					Article modifArticle=shopJob.readCaddy(index);
+
+					// modification de la quantitée de l'article
+					System.out.println("Entrez la nouvelle quantité.");
+					int qty=scan.nextInt();
+					modifArticle.setQty(qty);
+					shopJob.updateCaddy(modifArticle);
+					caddy();
+					break;
+
+				case 2 : // Suppression d'un article par sa ref
+					System.out.println("Pour supprimer un article taper sa ref.");
+					index=scan.nextInt();
+					shopJob.deleteCaddy(index);
+					caddy();
+					break;
+
+				case  3: // Exit application
+					System.out.println("Sortie panier.");
+					break;
+
+				default : System.out.println("mauvaise saisie, votre choix : "+rep+" est inexistant dans le menu");
+				}	
+			}
+		}
+
+
+	}
+	/** M�thode qui affiche la commande  */
+	public static void displayCommand(Scanner scan) {
+
+		if (shopJob.readAll().isEmpty()) {
+			System.out.println("-----------------------------");
+			System.out.println("Vous n'avez pas de commande.");
+			System.out.println("-----------------------------");
+		} else {
+			caddy();
+			// si commande on peut valider
+			System.out.println("Valider la commande Y/N ?");
+			String rep = scan.next().toUpperCase();
+
+			if (rep.equals("Y")) {
+				shopJob.order();
+				System.out.println("Commande validée.");
+			} else {
+				System.out.println("Panier toujours valide");
+
+			}
+
+		}
+
 	}
 }
 

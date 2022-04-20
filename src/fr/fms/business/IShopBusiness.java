@@ -3,7 +3,7 @@
  */
 package fr.fms.business;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 import fr.fms.entities.Article;
 
@@ -15,10 +15,11 @@ import fr.fms.entities.Article;
  */
 public interface IShopBusiness {
 
-	public void addCard(Article article);													//ajoute un compte associé à un client à notre banque
-	public Account consultAccount(long accountId);												//renvoi le compte correspondant à l'id 
-	public void pay(long accountId, double amount) ;											//faire un versement sur un compte 
-	public boolean withdraw(long accountId, double amount);										//faire un retrait sur un compte
-	public void transfert(long accountId, long accIdDest, double amount)throws Exception;	    //faire un virement d'un compte source vers destination
-	public ArrayList<Transaction> listTransactions(long accountId); 
+	public void addCaddy(Article article);					//ajoute un article au panier
+	public Article readCaddy(int id);						// renvoi un objet correspondant à l'id du panier
+	public boolean updateCaddy(Article article);			//modifie un article du panier
+	public boolean deleteCaddy(int id);						// supprime l'article du panier
+	public void order() ;									//valide la commande du panier
+	public Map<Integer,Article> readAll(); 				// retourne le panier
+	
 }

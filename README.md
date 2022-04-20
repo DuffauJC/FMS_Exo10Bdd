@@ -12,3 +12,6 @@ de permettre l’accès à un utilisateur uniquement sur la base de données Sho
 Exercice 12 : Enfin, d’après vous, quelles seraient les méthodes d’une interface 
 représentant la couche métier de notre appli de E-commerce ici ?
 
+Exercice 13 : Implémenter votre interface puis réaliser une application permettant l’achat 
+d’articles dans une boutique en remplissant un panier avec la possibilité de passer 
+commande à tout instant…
